@@ -1,48 +1,21 @@
--- Switch to the 'master' system database. 
--- This is necessary because you cannot create a new database while using a database that doesn't yet exist.
-USE master; 
+/********************************************************************************************
+-- Script Name:    CreateAndDropDataWarehouse.sql
+-- Author:         Paul Mampilly
+-- Created On:     16/06/2025
+-- Description:    
+    This script demonstrates the end-to-end process of creating a basic data warehouse 
+    environment in SQL Server using the multi-layered (Bronze, Silver, Gold) architecture.
+    It includes:
+      - Creating a new database called 'DataWarehouse'
+      - Creating three schemas: bronze (raw), silver (cleaned), and gold (curated)
+      - A cleanup section that drops the database safely if it exists
 
--- Create a new database named 'DataWarehouse'.
--- This will serve as the main container for your data warehouse project.
-CREATE DATABASE DataWarehouse;
+-- Usage Notes:
+    - Ensure you are connected to the 'master' database before running this script
+    - The DROP DATABASE section sets the database to SINGLE_USER mode and rolls back 
+      all active transactions to allow safe deletion.
 
--- Switch context to the newly created 'DataWarehouse' database 
--- so that all subsequent operations (schemas, tables, etc.) are applied within it.
-USE DataWarehouse;
-
--- Create a schema named 'bronze'.
--- This layer typically holds raw, untransformed data directly ingested from source systems.
-CREATE SCHEMA bronze;
-GO
-
--- Create a schema named 'silver'.
--- This layer stores cleaned, transformed, and enriched data that is ready for analysis or joining.
-CREATE SCHEMA silver;
-GO
-
--- Create a schema named 'gold'.
--- This layer contains curated, aggregated, and business-ready data optimized for reporting and dashboards.
-CREATE SCHEMA gold;
-GO
-
--- Ensure we're not using the database we're about to drop
-USE master;
-GO
-
--- Check if the database 'DataWarehouse' exists
-IF EXISTS (
-    SELECT 1 
-    FROM sys.databases 
-    WHERE name = 'DataWarehouse'
-)
-BEGIN
-    -- Set the database to SINGLE_USER to force all connections to close
-    -- ROLLBACK IMMEDIATE ends all transactions and disconnects users
-    ALTER DATABASE DataWarehouse
-    SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-
-    -- Drop the database
-    DROP DATABASE DataWarehouse;
-END;
-GO
-
+-- Warning:
+    - Running this script will delete the 'DataWarehouse' database if it already exists,
+      along with all its contents. Use with caution in development environments only.
+********************************************************************************************/
