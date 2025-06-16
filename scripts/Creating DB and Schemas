@@ -1,21 +1,63 @@
 /********************************************************************************************
--- Script Name:    CreateAndDropDataWarehouse.sql
--- Author:         Paul Mampilly
--- Created On:     16/06/2025
+-- Script Name:    DropAndRecreateDataWarehouse.sql
+-- Author:         [Your Name]
+-- Created On:     [Insert Date]
 -- Description:    
-    This script demonstrates the end-to-end process of creating a basic data warehouse 
-    environment in SQL Server using the multi-layered (Bronze, Silver, Gold) architecture.
-    It includes:
-      - Creating a new database called 'DataWarehouse'
-      - Creating three schemas: bronze (raw), silver (cleaned), and gold (curated)
-      - A cleanup section that drops the database safely if it exists
+    This script safely drops and recreates a SQL Server database called 'DataWarehouse'. 
+    It follows a layered architecture by creating three schemas within the database:
+        - bronze: raw data layer
+        - silver: cleansed/transformed layer
+        - gold: curated/business-ready layer
+
+    Steps:
+      1. Check if 'DataWarehouse' exists; if so, drop it safely using SINGLE_USER mode.
+      2. Create a new 'DataWarehouse' database.
+      3. Define schemas for bronze, silver, and gold layers.
 
 -- Usage Notes:
-    - Ensure you are connected to the 'master' database before running this script
-    - The DROP DATABASE section sets the database to SINGLE_USER mode and rolls back 
-      all active transactions to allow safe deletion.
+    - Must be run from the 'master' or any database other than 'DataWarehouse'
+    - DROP DATABASE is destructive. Only use in development/test environments.
 
 -- Warning:
-    - Running this script will delete the 'DataWarehouse' database if it already exists,
-      along with all its contents. Use with caution in development environments only.
+    - Ensure no production data is lost when using this script.
 ********************************************************************************************/
+
+-- Step 1: Ensure we're not connected to 'DataWarehouse' before dropping it
+USE master;
+GO
+
+-- Step 2: Drop the 'DataWarehouse' database if it exists
+IF EXISTS (
+    SELECT 1 
+    FROM sys.databases 
+    WHERE name = 'DataWarehouse'
+)
+BEGIN
+    -- Force disconnect all users and rollback active transactions
+    ALTER DATABASE DataWarehouse
+    SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+
+    -- Drop the database
+    DROP DATABASE DataWarehouse;
+END;
+GO
+
+-- Step 3: Create a new 'DataWarehouse' database
+CREATE DATABASE DataWarehouse;
+GO
+
+-- Step 4: Switch to the newly created database
+USE DataWarehouse;
+GO
+
+-- Step 5: Create the Bronze schema (raw data)
+CREATE SCHEMA bronze;
+GO
+
+-- Step 6: Create the Silver schema (cleaned/transformed data)
+CREATE SCHEMA silver;
+GO
+
+-- Step 7: Create the Gold schema (business-ready data)
+CREATE SCHEMA gold;
+GO
