@@ -1,0 +1,26 @@
+-- Switch to the 'master' system database. 
+-- This is necessary because you cannot create a new database while using a database that doesn't yet exist.
+USE master; 
+
+-- Create a new database named 'DataWarehouse'.
+-- This will serve as the main container for your data warehouse project.
+CREATE DATABASE DataWarehouse;
+
+-- Switch context to the newly created 'DataWarehouse' database 
+-- so that all subsequent operations (schemas, tables, etc.) are applied within it.
+USE DataWarehouse;
+
+-- Create a schema named 'bronze'.
+-- This layer typically holds raw, untransformed data directly ingested from source systems.
+CREATE SCHEMA bronze;
+GO
+
+-- Create a schema named 'silver'.
+-- This layer stores cleaned, transformed, and enriched data that is ready for analysis or joining.
+CREATE SCHEMA silver;
+GO
+
+-- Create a schema named 'gold'.
+-- This layer contains curated, aggregated, and business-ready data optimized for reporting and dashboards.
+CREATE SCHEMA gold;
+GO
