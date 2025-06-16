@@ -24,3 +24,25 @@ GO
 -- This layer contains curated, aggregated, and business-ready data optimized for reporting and dashboards.
 CREATE SCHEMA gold;
 GO
+
+-- Ensure we're not using the database we're about to drop
+USE master;
+GO
+
+-- Check if the database 'DataWarehouse' exists
+IF EXISTS (
+    SELECT 1 
+    FROM sys.databases 
+    WHERE name = 'DataWarehouse'
+)
+BEGIN
+    -- Set the database to SINGLE_USER to force all connections to close
+    -- ROLLBACK IMMEDIATE ends all transactions and disconnects users
+    ALTER DATABASE DataWarehouse
+    SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+
+    -- Drop the database
+    DROP DATABASE DataWarehouse;
+END;
+GO
+
