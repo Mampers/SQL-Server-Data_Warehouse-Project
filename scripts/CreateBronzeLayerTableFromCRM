@@ -1,0 +1,72 @@
+/********************************************************************************************
+-- Script Name:    CreateBronzeLayerTablesFromCRM.sql
+-- Author:         Paul Mampilly
+-- Created On:     16/06/2025
+-- Description:    
+    This script creates the raw ingestion layer ("bronze") tables for a Data Warehouse.
+    It ensures a clean slate by dropping the tables if they already exist. These tables 
+    represent source data from CRM and ERP systems and are designed to serve as the 
+    foundation for further transformation in the silver and gold layers.
+
+-- Structure:
+    1. CRM Customer Information
+    2. CRM Product Information
+    3. CRM Sales Details
+    4. ERP Location Data
+    5. ERP Customer Demographics
+    6. ERP Product Category Data
+
+-- Usage Notes:
+    - Ensure the 'bronze' schema exists before running this script.
+    - This script is destructive (drops existing tables), use only in dev/test environments.
+********************************************************************************************/
+
+-- 1. Drop and create CRM Customer Information table
+IF OBJECT_ID('bronze.crm_cust_info', 'U') IS NOT NULL
+    DROP TABLE bronze.crm_cust_info;
+GO
+
+CREATE TABLE bronze.crm_cust_info (
+    cst_id              INT,            -- Customer ID
+    cst_key             NVARCHAR(50),   -- External Customer Key
+    cst_firstname       NVARCHAR(50),   -- Customer First Name 
+    cst_lastname        NVARCHAR(50),   -- Customer Last Name
+    cst_marital_status  NVARCHAR(50),   -- Marital status (was misnamed earlier as 'material')
+    cst_gndr            NVARCHAR(50),   -- Gender
+    cst_create_date     DATE            -- Customer creation date
+);
+GO
+
+-- 2. Drop and create CRM Product Information table
+IF OBJECT_ID('bronze.crm_prd_info', 'U') IS NOT NULL
+    DROP TABLE bronze.crm_prd_info;
+GO
+
+CREATE TABLE bronze.crm_prd_info (
+    prd_id       INT,            -- Product ID
+    prd_key      NVARCHAR(50),   -- External Product Key
+    prd_nm       NVARCHAR(50),   -- Product Name
+    prd_cost     INT,            -- Cost of product
+    prd_line     NVARCHAR(50),   -- Product Line
+    prd_start_dt DATETIME,       -- Availability start date
+    prd_end_dt   DATETIME        -- Availability end date
+);
+GO
+
+-- 3. Drop and create CRM Sales Details table
+IF OBJECT_ID('bronze.crm_sales_details', 'U') IS NOT NULL
+    DROP TABLE bronze.crm_sales_details;
+GO
+
+CREATE TABLE bronze.crm_sales_details (
+    sls_ord_num  NVARCHAR(50),   -- Sales Order Number
+    sls_prd_key  NVARCHAR(50),   -- Product Key (foreign)
+    sls_cust_id  INT,            -- Customer ID (foreign)
+    sls_order_dt INT,            -- Order Date (in surrogate int format)
+    sls_ship_dt  INT,            -- Shipping Date (int format)
+    sls_due_dt   INT,            -- Due Date (int format)
+    sls_sales    INT,            -- Total sales amount
+    sls_quantity INT,            -- Quantity sold
+    sls_price    INT             -- Sales Price
+	);
+
